@@ -20,6 +20,7 @@ public class Game implements ApplicationListener {
 	private ShapeRenderer shapeRenderer;
 	private boolean paused = false;
 	public float lineStartX, lineStartY;
+	private InputHandler inputHandler;
 	private static Game game;
 
 	@Override
@@ -28,7 +29,7 @@ public class Game implements ApplicationListener {
 		camera = new OrthographicCamera(1, Gdx.graphics.getHeight()
 				/ Gdx.graphics.getWidth());
 		shapeRenderer = new ShapeRenderer();
-		Gdx.input.setInputProcessor(new InputHandler());
+		Gdx.input.setInputProcessor(inputHandler=new InputHandler());
 	}
 
 	@Override
@@ -38,11 +39,14 @@ public class Game implements ApplicationListener {
 
 	@Override
 	public void render() {
+		//logic
+		if (!paused)
+			GravityPoint.updateAll();
+		camera.update();
+		inputHandler.loop(); //some input code
 		// clear
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-		if (!paused)
-			GravityPoint.updateAll();
 		// actual render
 		shapeRenderer.setProjectionMatrix(camera.combined);
 		shapeRenderer.begin(ShapeType.Line);

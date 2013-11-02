@@ -6,15 +6,9 @@ import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 
 public class InputHandler implements InputProcessor {
-	@Override
-	public boolean keyDown(int keycode) {
-		if (keycode == Keys.ESCAPE)
-			;
-		if (keycode == Keys.R)
-			GravityPoint.destroyAll();
-		if (keycode == Keys.P)
-			Game.get().setPaused(!Game.get().isPaused());
-		if (keycode == Keys.W || keycode == Keys.UP)
+	
+	public void loop(){ //called every frame
+		if (Gdx.input.isKeyPressed(Keys.W) || Gdx.input.isKeyPressed(Keys.UP))
 			Game.get().getCamera().translate(0, -5);
 		if (Gdx.input.isKeyPressed(Keys.S) || Gdx.input.isKeyPressed(Keys.DOWN))
 			Game.get().getCamera().translate(0, 5);
@@ -23,6 +17,15 @@ public class InputHandler implements InputProcessor {
 		if (Gdx.input.isKeyPressed(Keys.D)
 				|| Gdx.input.isKeyPressed(Keys.RIGHT))
 			Game.get().getCamera().translate(5, 0);
+	}
+	@Override
+	public boolean keyDown(int keycode) {
+		if (keycode == Keys.ESCAPE)
+			;
+		if (keycode == Keys.R)
+			GravityPoint.destroyAll();
+		if (keycode == Keys.P)
+			Game.get().setPaused(!Game.get().isPaused());
 		return false;
 	}
 
@@ -77,7 +80,7 @@ public class InputHandler implements InputProcessor {
 
 	@Override
 	public boolean scrolled(int amount) {
-		// TODO Auto-generated method stub
+		Game.get().getCamera().zoom+=amount;
 		return false;
 	}
 

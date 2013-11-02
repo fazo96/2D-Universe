@@ -96,14 +96,16 @@ public class GravityPoint {
 		for (GravityPoint p : points) {
 			speedX += accX;
 			speedY += accY;
-			if (p != this && overlaps(p) && getR() >= p.getR()) {
+			if (p != this && overlaps(p) && getR() >= p.getR()) { //collision
 				double areaThis = Math.PI * Math.pow(this.getR(), 2);
 				double areaP = Math.PI * Math.pow(p.getR(), 2);
 				double areaTot = areaThis + areaP;
 				double radiusNew = Math.sqrt(areaTot / Math.PI);
+				if(radiusNew<=0)radiusNew=3;
 				this.setR(radiusNew);
 				this.density = (areaThis * this.density + areaP * p.density)
 						/ areaTot;
+				if(this.density<=0)this.density=0.001;
 				this.accX = (areaP * p.accX + areaThis * this.accX) / areaTot;
 				this.accY = (areaP * p.accY + areaThis * this.accY) / areaTot;
 				this.speedX = (areaP * p.speedX + areaThis * this.speedX)
