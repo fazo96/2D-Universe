@@ -7,194 +7,200 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class GravityPoint {
 
-    public static void destroyAll() {
-        for(GravityPoint p:points)p.destroyASAP=true;
-    }
+	public static void destroyAll() {
+		for (GravityPoint p : points)
+			p.destroyASAP = true;
+	}
 
-    protected boolean destroyed = false, destroyASAP = false;
-    private double x, y;
-    private double r;
-    private static double simulationSpeed = 0.000005;
-    private double density = 0.5, accX = 0, accY = 0, speedX = 0, speedY = 0;
-    private static ArrayList<GravityPoint> points = new ArrayList<GravityPoint>();
+	protected boolean destroyed = false, destroyASAP = false;
+	private double x, y;
+	private double r;
+	private static double simulationSpeed = 0.000005;
+	private double density = 0.5, accX = 0, accY = 0, speedX = 0, speedY = 0;
+	private static ArrayList<GravityPoint> points = new ArrayList<GravityPoint>();
 
-    public void move(double offsetX, double offsetY) {
-        x += offsetX;
-        y += offsetY;
-    }
+	public void move(double offsetX, double offsetY) {
+		x += offsetX;
+		y += offsetY;
+	}
 
-    public static void drawAll(ShapeRenderer g) {
-        for (GravityPoint c : GravityPoint.getPoints()) {
-            c.draw(g);
-        }
-    }
+	public static void drawAll(ShapeRenderer g) {
+		for (GravityPoint c : GravityPoint.getPoints()) {
+			c.draw(g);
+		}
+	}
 
-    public void draw(ShapeRenderer g) {
-        g.setColor(1,1,1,1);
-        g.circle((float) getX(), (float) getY(), (float) getR());
-        g.circle((float) (getX()), (float) (getY()), 1);
-    }
+	public void draw(ShapeRenderer g) {
+		g.setColor(1, 1, 1, 1);
+		g.circle((float) getX(), (float) getY(), (float) getR());
+		g.circle((float) (getX()), (float) (getY()), 1);
+	}
 
-    public static void updateAll() {
-        try {
-            for (GravityPoint c : points) {
-                c.checkDestroy();
-            }
-        } catch (ConcurrentModificationException ex) {
-            //System.out.println("ConcurrentModificationExeption caught successfully");
-        }
-        for (GravityPoint c : points) {
-            c.updateGravity();
-        }
-        for (GravityPoint c : points) {
-            c.updatePosition();
-        }
-    }
+	public static void updateAll() {
+		try {
+			for (GravityPoint c : points) {
+				c.checkDestroy();
+			}
+		} catch (ConcurrentModificationException ex) {
+			// System.out.println("ConcurrentModificationExeption caught successfully");
+		}
+		for (GravityPoint c : points) {
+			c.updateGravity();
+		}
+		for (GravityPoint c : points) {
+			c.updatePosition();
+		}
+	}
 
-    public GravityPoint(double x, double y, double r, double density) {
-        this.x = x;
-        this.y = y;
-        this.r = r;
-        this.density = density;
-        points.add(this);
-    }
-    
-    public GravityPoint(double x, double y, double r, double density, double speedX, double speedY){
-    	this(x,y,r,density);
-    	this.speedX=speedX;
-    	this.speedY=speedY;
-    }
+	public GravityPoint(double x, double y, double r, double density) {
+		this.x = x;
+		this.y = y;
+		this.r = r;
+		this.density = density;
+		points.add(this);
+	}
 
-    public void destroy() {
-        this.destroyASAP = true;
-        destroyed = true;
-        points.remove(this);
-    }
+	public GravityPoint(double x, double y, double r, double density,
+			double speedX, double speedY) {
+		this(x, y, r, density);
+		this.speedX = speedX;
+		this.speedY = speedY;
+	}
 
-    public double getGravityForce() {
-        return density * Math.PI * Math.pow(getR(), 2);
-    }
+	public void destroy() {
+		this.destroyASAP = true;
+		destroyed = true;
+		points.remove(this);
+	}
 
-    public boolean overlaps(GravityPoint c) {
-        return distance(c) < (getR() + c.getR());
-    }
+	public double getGravityForce() {
+		return density * Math.PI * Math.pow(getR(), 2);
+	}
 
-    public boolean isDestroyed() {
-        return destroyed;
-    }
+	public boolean overlaps(GravityPoint c) {
+		return distance(c) < (getR() + c.getR());
+	}
 
-    public void checkDestroy() {
-        if (destroyASAP) {
-            destroy();
-        }
-    }
+	public boolean isDestroyed() {
+		return destroyed;
+	}
 
-    public void updatePosition() {
-        //apply attraction
-        for (GravityPoint p : points) {
-            speedX += accX;
-            speedY += accY;
-            if (p != this && overlaps(p) && getR() >= p.getR()) {
-                double areaThis = Math.PI * Math.pow(this.getR(), 2);
-                double areaP = Math.PI * Math.pow(p.getR(), 2);
-                double areaTot = areaThis + areaP;
-                double radiusNew = Math.sqrt(areaTot / Math.PI);
-                this.setR(radiusNew);
-                this.density = (areaThis * this.density + areaP * p.density) / areaTot;
-                this.accX = (areaP * p.accX + areaThis * this.accX) / areaTot;
-                this.accY = (areaP * p.accY + areaThis * this.accY) / areaTot;
-                this.speedX = (areaP * p.speedX + areaThis * this.speedX) / areaTot;
-                this.speedY = (areaP * p.speedY + areaThis * this.speedY) / areaTot;
-                p.destroyASAP = true; //adios, p
-            }
-        }
-        move(speedX, speedY);
-    }
+	public void checkDestroy() {
+		if (destroyASAP) {
+			destroy();
+		}
+	}
 
-    public void updateGravity() {
-        for (GravityPoint p : points) {
-            if (density == 0) {
-                return;
-            }
-            if (p == this) {
-                continue;
-            }
-            double dist = distance(p);
-            if (p.density == 0) {
-                continue;
-            }
-            //calculate acceleration
-            double accMul = 5 * p.getGravityForce() / dist;
-            double dx = (p.getX() - getX()) / p.getR();
-            dx = dx < -1 ? -1 : dx > 1 ? 1 : dx;
-            double dy = (p.getY() - getY()) / p.getR();
-            dy = dy < -1 ? -1 : dy > 1 ? 1 : dy;
-            accX = dx * accMul * simulationSpeed;
-            accY = dy * accMul * simulationSpeed;
-        }
-    }
-    
-    public double getR() {
-        return r;
-    }
+	public void updatePosition() {
+		// apply attraction
+		for (GravityPoint p : points) {
+			speedX += accX;
+			speedY += accY;
+			if (p != this && overlaps(p) && getR() >= p.getR()) {
+				double areaThis = Math.PI * Math.pow(this.getR(), 2);
+				double areaP = Math.PI * Math.pow(p.getR(), 2);
+				double areaTot = areaThis + areaP;
+				double radiusNew = Math.sqrt(areaTot / Math.PI);
+				this.setR(radiusNew);
+				this.density = (areaThis * this.density + areaP * p.density)
+						/ areaTot;
+				this.accX = (areaP * p.accX + areaThis * this.accX) / areaTot;
+				this.accY = (areaP * p.accY + areaThis * this.accY) / areaTot;
+				this.speedX = (areaP * p.speedX + areaThis * this.speedX)
+						/ areaTot;
+				this.speedY = (areaP * p.speedY + areaThis * this.speedY)
+						/ areaTot;
+				p.destroyASAP = true; // adios, p
+			}
+		}
+		move(speedX, speedY);
+	}
 
-    public void setR(double r) {
-        this.r = r;
-    }
+	public void updateGravity() {
+		for (GravityPoint p : points) {
+			if (density == 0) {
+				return;
+			}
+			if (p == this) {
+				continue;
+			}
+			double dist = distance(p);
+			if (p.density == 0) {
+				continue;
+			}
+			// calculate acceleration
+			double accMul = 5 * p.getGravityForce() / dist;
+			double dx = (p.getX() - getX()) / p.getR();
+			dx = dx < -1 ? -1 : dx > 1 ? 1 : dx;
+			double dy = (p.getY() - getY()) / p.getR();
+			dy = dy < -1 ? -1 : dy > 1 ? 1 : dy;
+			accX = dx * accMul * simulationSpeed;
+			accY = dy * accMul * simulationSpeed;
+		}
+	}
 
-    public double distance(GravityPoint c) {
-        return Math.sqrt(Math.pow(c.getX() - getX(), 2) + Math.pow(c.getY() - getY(), 2));
-    }
+	public double getR() {
+		return r;
+	}
 
-    public double getX() {
-        return x;
-    }
+	public void setR(double r) {
+		this.r = r;
+	}
 
-    public void setX(double x) {
-        this.x = x;
-    }
+	public double distance(GravityPoint c) {
+		return Math.sqrt(Math.pow(c.getX() - getX(), 2)
+				+ Math.pow(c.getY() - getY(), 2));
+	}
 
-    public double getY() {
-        return y;
-    }
+	public double getX() {
+		return x;
+	}
 
-    public void setY(double y) {
-        this.y = y;
-    }
+	public void setX(double x) {
+		this.x = x;
+	}
 
-    public double getAccX() {
-        return accX;
-    }
+	public double getY() {
+		return y;
+	}
 
-    public void setAccX(double accX) {
-        this.accX = accX;
-    }
+	public void setY(double y) {
+		this.y = y;
+	}
 
-    public double getSpeedX() {
-        return speedX;
-    }
+	public double getAccX() {
+		return accX;
+	}
 
-    public void setSpeedX(double speedX) {
-        this.speedX = speedX;
-    }
+	public void setAccX(double accX) {
+		this.accX = accX;
+	}
 
-    public double getSpeedY() {
-        return speedY;
-    }
+	public double getSpeedX() {
+		return speedX;
+	}
 
-    public void setSpeedY(double speedY) {
-        this.speedY = speedY;
-    }
+	public void setSpeedX(double speedX) {
+		this.speedX = speedX;
+	}
 
-    public static ArrayList<GravityPoint> getPoints() {
-        return points;
-    }
+	public double getSpeedY() {
+		return speedY;
+	}
 
-    public double getDensity() {
-        return density;
-    }
+	public void setSpeedY(double speedY) {
+		this.speedY = speedY;
+	}
 
-    public void setDensity(double density) {
-        this.density = density;
-    }
+	public static ArrayList<GravityPoint> getPoints() {
+		return points;
+	}
+
+	public double getDensity() {
+		return density;
+	}
+
+	public void setDensity(double density) {
+		this.density = density;
+	}
 }
