@@ -1,4 +1,4 @@
-package com.me.mygdxgame;
+package com.me.game;
 
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
