@@ -26,10 +26,12 @@ public class Game implements ApplicationListener {
 	@Override
 	public void create() {
 		game = this;
+		//Let's instance some objects
+		// Define camera viewport
 		camera = new OrthographicCamera(1, Gdx.graphics.getHeight()
 				/ Gdx.graphics.getWidth());
 		shapeRenderer = new ShapeRenderer();
-		Gdx.input.setInputProcessor(inputHandler=new InputHandler());
+		Gdx.input.setInputProcessor(inputHandler = new InputHandler());
 	}
 
 	@Override
@@ -37,19 +39,24 @@ public class Game implements ApplicationListener {
 		shapeRenderer.dispose();
 	}
 
-	@Override
-	public void render() {
-		//logic
-		if (!paused)
+	public void logic() {
+		if (!paused) //Update gravity by 1 tick
 			GravityPoint.updateAll();
 		camera.update();
-		inputHandler.loop(); //some input code
+		inputHandler.loop(); // some input code
+	}
+
+	@Override
+	public void render() {
+		// Call to method that executes the game logic
+		logic();
 		// clear
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		// actual render
 		shapeRenderer.setProjectionMatrix(camera.combined);
 		shapeRenderer.begin(ShapeType.Line);
+		//When left mouse button is pressed, render line
 		if (Gdx.input.isButtonPressed(Buttons.LEFT))
 			shapeRenderer.line(
 					lineStartX,
@@ -58,12 +65,15 @@ public class Game implements ApplicationListener {
 							- Gdx.graphics.getWidth() / 2,
 					Gdx.input.getY() + camera.position.y
 							- Gdx.graphics.getHeight() / 2);
+		//Draw every gravity point in the universe
 		GravityPoint.drawAll(shapeRenderer);
 		shapeRenderer.end();
 	}
 
 	@Override
 	public void resize(int width, int height) {
+		//When the window gets resized, this method is triggered
+		//This fixes the camera viewport
 		camera.setToOrtho(true, Gdx.graphics.getWidth(),
 				Gdx.graphics.getHeight());
 	}
