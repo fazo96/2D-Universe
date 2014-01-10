@@ -1,5 +1,15 @@
 # 2D-Universe
-A simple game like program aimed to simulate a 2D universe. Made using LibGDX. Currently it's very early, I will add more info and screenshots when I improve it a little bit.
+A simple game like program aimed to simulate a 2D universe. Made using LibGDX. Currently it's very early, it's just a few lines of code. I suggest trying it!
+Here's a little youtube video that shows what the program does (not much). Sorry for the bad quality.
+## Features
+You can spawn circular particles that are attracked to each other in a 2D world.
+Resizable window! (Every game should have this)
+A simple collision system. When two particles collide, the big one absorbs the smaller one.
+You can move the camera around.
+## Usage
+Once you start it there's a black screen. You can resize the window as you wish.
+Try clicking to spawn a particle. You can click and drag to decide where the particle will go and how fast.
+Try using WASD to move the camera. If you press R everything will be erased (you can use this instead of restarting)
 
 # How to import in Eclipse
 ## From scratch
